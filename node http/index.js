@@ -1,5 +1,4 @@
 var http = require('http');
-var async = require('async'); 
 
 var timestamp = new Date().getTime();
 var _path = '/hi?message=HelloFeign' + timestamp;
@@ -7,12 +6,17 @@ var _path = '/hi?message=HelloFeign' + timestamp;
 var options = {
     hostname: '127.0.0.1',
     port: 8081,
-    path: _path,
+    path: '/hi?message=HelloFeign' + new Date().getTime(),
     method: 'GET'
 };
 
-function sendRequest(option,n, callback) {
-    var req = http.request(option, function (res) {
+function sendRequest(n, callback) {
+    var req = http.request({
+        hostname: '127.0.0.1',
+        port: 8081,
+        path: '/hi?message=HelloFeign' + new Date().getTime(),
+        method: 'GET'
+    }, function (res) {
         // console.log('STATUS: ' + res.statusCode);
         // console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
@@ -22,7 +26,7 @@ function sendRequest(option,n, callback) {
     });
 
     req.on('error', function (e) {
-        console.log('problem with request: ' + e.message);
+        console.log('problem with request: ' + e);
         callback(err);
     });
     
@@ -30,7 +34,7 @@ function sendRequest(option,n, callback) {
 }
 
 function sendRequestWrapper(n, done) {
-    sendRequest(options,n, function (err) {
+    sendRequest(n, function (err) {
         done(err);
     });
 };
@@ -50,4 +54,4 @@ function sendRequestWrapper(n, done) {
 // async.timesSeries(10, sendRequestWrapper); 
 setInterval(()=>{
     sendRequestWrapper(index++)
-}, 100)
+}, 1)
